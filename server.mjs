@@ -7,6 +7,8 @@ import Wallet from './models/Wallet.mjs';
 import blockRouter from './routes/block-routes.mjs';
 import blockchainRouter from './routes/blockchain-routes.mjs';
 import transactionRouter from './routes/transaction-routes.mjs';
+import authRouter from './routes/auth-routes.mjs';
+import usersRouter from './routes/user-routes.mjs';
 import PubNubServer from './pubnub-server.mjs';
 import fetch from 'node-fetch';
 import { errorHandler } from './middleware/errorHandler.mjs';
@@ -49,6 +51,8 @@ setTimeout(() => {
 app.use('/api/v1/blockchain', blockchainRouter);
 app.use('/api/v1/block', blockRouter);
 app.use('/api/v1/wallet', transactionRouter);
+app.use('/api/v1/auth', authRouter);
+app.use('/api/v1/users', usersRouter);
 
 app.all('*', (req, res, next) => {
   next(
