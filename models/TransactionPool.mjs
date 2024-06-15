@@ -24,10 +24,6 @@ export default class TransactionPool {
     this.transactionMap = {};
   }
 
-  replaceTransactionMap(transactionMap) {
-    this.transactionMap = transactionMap;
-  }
-
   findTransactionByAddress({ address }) {
     const transactions = Object.values(this.transactionMap);
     return transactions.find(
@@ -39,5 +35,9 @@ export default class TransactionPool {
     return Object.values(this.transactionMap).filter((transaction) =>
       Transaction.isValid(transaction)
     );
+  }
+
+  replaceTransactionMap(transactionMap) {
+    this.transactionMap = transactionMap;
   }
 }

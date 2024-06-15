@@ -1,16 +1,16 @@
 import express from 'express';
 import {
-  addTransaction,
+  createTransaction,
   getTransactionPool,
   getWalletBalance,
-  mineTransactions,
+  minePendingTransactions,
 } from '../controllers/transaction-controller.mjs';
 
 const router = express.Router();
 
-router.route('/transaction').post(addTransaction);
+router.route('/transaction').post(createTransaction);
 router.route('/transactions').get(getTransactionPool);
-router.route('/mine').get(mineTransactions);
+router.route('/mine').get(minePendingTransactions);
 router.route('/info').get(getWalletBalance);
 
 export default router;

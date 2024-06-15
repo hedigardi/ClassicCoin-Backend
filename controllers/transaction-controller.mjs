@@ -5,7 +5,7 @@ import Wallet from '../models/Wallet.mjs';
 import ResponseModel from '../models/ResponseModel.mjs';
 import { asyncHandler } from '../middleware/asyncHandler.mjs';
 
-export const addTransaction = asyncHandler(async (req, res, next) => {
+export const createTransaction = asyncHandler(async (req, res, next) => {
   const { amount, recipient } = req.body;
 
   let transaction = transactionPool.findTransactionByAddress({
@@ -32,24 +32,6 @@ export const addTransaction = asyncHandler(async (req, res, next) => {
   res.status(201).json(response);
 });
 
-export const getWalletBalance = asyncHandler(async (req, res, next) => {
-  const address = wallet.publicKey;
-  const balance = Wallet.calculateBalance({
-    chain: blockchain,
-    address,
-  });
-
-  const message = `Your current balance is ${balance} CLA.`;
-
-  const response = new ResponseModel({
-    statusCode: 200,
-    message: message,
-    data: { address: address, balance: balance },
-  });
-
-  res.status(200).json(response);
-});
-
 export const getTransactionPool = asyncHandler(async (req, res, next) => {
   const transactionMap = transactionPool.transactionMap;
 
@@ -61,7 +43,7 @@ export const getTransactionPool = asyncHandler(async (req, res, next) => {
   res.status(200).json(response);
 });
 
-export const mineTransactions = asyncHandler(async (req, res, next) => {
+export const minePendingTransactions = asyncHandler(async (req, res, next) => {
   const miner = new Miner({
     blockchain,
     transactionPool,
@@ -76,6 +58,24 @@ export const mineTransactions = asyncHandler(async (req, res, next) => {
   const response = new ResponseModel({
     statusCode: 200,
     message: message,
+  });
+
+  res.status(200).json(response);
+});
+
+export const getWalletBalance = asyncHandler(async (req, res, next) => {
+  const address = wallet.publicKey;
+  const balance = Wallet.calculateBalance({
+    chain: blockchain,
+    address,
+  });
+
+  const message = `Your current balance is ${balance} CLA.`;
+
+  const response = new ResponseModel({
+    statusCode: 200,
+    message: message,
+    data: { address: address, balance: balance },
   });
 
   res.status(200).json(response);

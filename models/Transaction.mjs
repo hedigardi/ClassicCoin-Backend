@@ -42,6 +42,24 @@ export default class Transaction {
     return true;
   }
 
+  createInputMap({ sender, outputMap }) {
+    return {
+      timestamp: Date.now(),
+      amount: sender.balance,
+      address: sender.publicKey,
+      signature: sender.sign(outputMap),
+    };
+  }
+
+  createOutputMap({ sender, recipient, amount }) {
+    const outputMap = {};
+
+    outputMap[recipient] = amount;
+    outputMap[sender.publicKey] = sender.balance - amount;
+
+    return outputMap;
+  }
+
   update({ sender, recipient, amount }) {
     if (amount > this.outputMap[sender.publicKey])
       throw new Error('Insufficient funds!');
@@ -56,23 +74,5 @@ export default class Transaction {
       this.outputMap[sender.publicKey] - amount;
 
     this.inputMap = this.createInputMap({ sender, outputMap: this.outputMap });
-  }
-
-  createOutputMap({ sender, recipient, amount }) {
-    const outputMap = {};
-
-    outputMap[recipient] = amount;
-    outputMap[sender.publicKey] = sender.balance - amount;
-
-    return outputMap;
-  }
-
-  createInputMap({ sender, outputMap }) {
-    return {
-      timestamp: Date.now(),
-      amount: sender.balance,
-      address: sender.publicKey,
-      signature: sender.sign(outputMap),
-    };
   }
 }
