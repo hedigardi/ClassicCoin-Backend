@@ -1,5 +1,6 @@
 import express from 'express';
 import dotenv from 'dotenv';
+import cors from 'cors';
 import connectDB from './config/mongoDB.mjs';
 import Blockchain from './models/Blockchain.mjs';
 import TransactionPool from './models/TransactionPool.mjs';
@@ -38,6 +39,7 @@ export const pubnubServer = new PubNubServer({
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 const DEFAULT_PORT = 5001;
 const ROOT_NODE = `http://localhost:${DEFAULT_PORT}`;
