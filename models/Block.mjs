@@ -26,26 +26,22 @@ export default class Block {
     do {
       nonce++;
       timestamp = Date.now();
-      difficulty = Block.adjustDifficultyLevel({ block: lastBlock, timestamp });
+      difficulty = Block.adjustDifficultyLevel({
+        originalBlock: lastBlock,
+        timestamp,
+      });
       hash = createHash(timestamp, lastHash, data, nonce, difficulty);
     } while (
       hexToBinary(hash).substring(0, difficulty) !== '0'.repeat(difficulty)
     );
 
-    return new this({
-      timestamp,
-      lastHash,
-      hash,
-      data,
-      nonce,
-      difficulty,
-    });
+    return new this({ timestamp, lastHash, data, difficulty, nonce, hash });
   }
 
-  static adjustDifficultyLevel({ block, timestamp }) {
-    const { difficulty } = block;
-
-    if (timestamp - block.timestamp > MINE_RATE) return difficulty - 1;
+  static adjustDifficultyLevel({ originalBlock, timestamp }) {
+    const { difficulty } = originalBlock;
+    if (difficulty < 1) return 1;
+    if (timestamp - originalBlock.timestamp > MINE_RATE) return difficulty - 1;
 
     return difficulty + 1;
   }

@@ -9,32 +9,32 @@ export default class TransactionPool {
     this.transactionMap[transaction.id] = transaction;
   }
 
-  clearBlockTransactions({ chain }) {
-    for (let i = 1; i < chain.length; i++) {
-      const block = chain[i];
-      for (let transaction of block.data) {
-        if (this.transactionMap[transaction.id]) {
-          delete this.transactionMap[transaction.id];
-        }
-      }
-    }
+  transactionExists({ address }) {
+    return Object.values(this.transactionMap).find(
+      (transaction) => transaction.inputMap.address === address
+    );
+  }
+
+  validateTransactions() {
+    return Object.values(this.transactionMap).filter((transaction) =>
+      Transaction.validate(transaction)
+    );
   }
 
   clearTransactions() {
     this.transactionMap = {};
   }
 
-  findTransactionByAddress({ address }) {
-    const transactions = Object.values(this.transactionMap);
-    return transactions.find(
-      (transaction) => transaction.inputMap.address === address
-    );
-  }
+  clearBlockTransactions({ chain }) {
+    for (let i = 1; i < chain.length; i++) {
+      const block = chain[i];
 
-  getValidTransactions() {
-    return Object.values(this.transactionMap).filter((transaction) =>
-      Transaction.isValid(transaction)
-    );
+      for (let transaction of block.data) {
+        if (this.transactionMap[transaction.id]) {
+          delete this.transactionMap[transaction.id];
+        }
+      }
+    }
   }
 
   replaceTransactionMap(transactionMap) {

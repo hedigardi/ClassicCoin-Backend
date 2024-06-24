@@ -1,22 +1,20 @@
 import Transaction from './Transaction.mjs';
 
 export default class Miner {
-  constructor({ blockchain, wallet, transactionPool, pubsub }) {
+  constructor({ blockchain, wallet, transactionPool, pubnubServer }) {
     this.blockchain = blockchain;
     this.wallet = wallet;
     this.transactionPool = transactionPool;
-    this.pubsub = pubsub;
+    this.pubnubServer = pubnubServer;
   }
 
   mineTransaction() {
-    const validTransactions = this.transactionPool.getValidTransactions();
-
+    const validTransactions = this.transactionPool.validateTransactions();
     validTransactions.push(
-      Transaction.createRewardTransaction({ miner: this.wallet })
+      Transaction.transactionReward({ minerWallet: this.wallet })
     );
-
     this.blockchain.addBlock({ data: validTransactions });
-    this.pubsub.broadcast();
+    this.pubnubServer.broadcast();
     this.transactionPool.clearTransactions();
   }
 }

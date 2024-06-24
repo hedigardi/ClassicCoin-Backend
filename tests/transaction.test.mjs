@@ -1,4 +1,4 @@
-import { it, describe, expect, beforeEach } from 'vitest';
+import { it, expect, describe, beforeEach } from 'vitest';
 import Transaction from '../models/Transaction.mjs';
 import Wallet from '../models/Wallet.mjs';
 import { verifySignature } from '../utilities/crypto-lib.mjs';
@@ -8,50 +8,54 @@ import {
 } from '../config/settings.mjs';
 
 describe('Transaction Management', () => {
-  let transaction, senderWallet, recipientName, amount;
+  let transaction, sender, recipient, amount;
 
   beforeEach(() => {
-    senderWallet = new Wallet();
-    recipientName = 'Hedi';
+    sender = new Wallet();
+    recipient = 'Hedi';
     amount = 25;
-    transaction = new Transaction({
-      sender: senderWallet,
-      recipient: recipientName,
-      amount,
-    });
+    transaction = new Transaction({ sender, recipient, amount });
   });
 
   describe('Transaction Properties', () => {
     it('should have a unique ID', () => {
       expect(transaction).toHaveProperty('id');
     });
+
+    it('should have an outputMap property', () => {
+      expect(transaction).toHaveProperty('outputMap');
+    });
+
+    it('should have an inputMap property', () => {
+      expect(transaction).toHaveProperty('inputMap');
+    });
   });
 
   describe('Transaction Outputs', () => {
     it('should correctly allocate the amount to the recipient', () => {
-      expect(transaction.outputMap[recipientName]).toEqual(amount);
+      expect(transaction.outputMap[recipient]).toBe(amount);
     });
 
     it('should correctly deduct the amount from the sender', () => {
-      expect(transaction.outputMap[senderWallet.publicKey]).toEqual(
-        senderWallet.balance - amount
+      expect(transaction.outputMap[sender.publicKey]).toBe(
+        sender.balance - amount
       );
     });
   });
 
   describe('Transaction Inputs', () => {
     it("should record the sender's public key as the address", () => {
-      expect(transaction.inputMap.address).toEqual(senderWallet.publicKey);
+      expect(transaction.inputMap.address).toEqual(sender.publicKey);
     });
 
     it("should record the sender's balance as the amount", () => {
-      expect(transaction.inputMap.amount).toEqual(senderWallet.balance);
+      expect(transaction.inputMap.amount).toEqual(sender.balance);
     });
 
     it('should sign the transaction input data', () => {
       expect(
         verifySignature({
-          publicKey: senderWallet.publicKey,
+          publicKey: sender.publicKey,
           data: transaction.outputMap,
           signature: transaction.inputMap.signature,
         })
@@ -62,15 +66,15 @@ describe('Transaction Management', () => {
   describe('Transaction Validation', () => {
     describe('when the transaction is valid', () => {
       it('should return true', () => {
-        expect(Transaction.isValid(transaction)).toBe(true);
+        expect(Transaction.validate(transaction)).toBe(true);
       });
     });
 
     describe('when the transaction is invalid', () => {
       describe('due to an invalid output amount', () => {
         it('should return false', () => {
-          transaction.outputMap[senderWallet.publicKey] = 123456789;
-          expect(Transaction.isValid(transaction)).toBe(false);
+          transaction.outputMap[sender.publicKey] = 123456789;
+          expect(Transaction.validate(transaction)).toBe(false);
         });
       });
 
@@ -79,36 +83,32 @@ describe('Transaction Management', () => {
           transaction.inputMap.signature = new Wallet().sign(
             'This is just dummy data'
           );
-          expect(Transaction.isValid(transaction)).toBe(false);
+          expect(Transaction.validate(transaction)).toBe(false);
         });
       });
     });
   });
 
   describe('Transaction Updates', () => {
-    let originalSignature, originalSenderOutput, nextRecipient, nextAmount;
+    let orgSignature, orgSenderOutput, nextRecipient, nextAmount;
 
     describe('when the amount is invalid (insufficient funds)', () => {
       it('should throw an error', () => {
         expect(() => {
-          transaction.update({
-            sender: senderWallet,
-            recipient: recipientName,
-            amount: 1010,
-          });
+          transaction.update({ sender, recipient, amount: 5000 });
         }).toThrow('Insufficient funds!');
       });
     });
 
     describe('when the amount is valid', () => {
       beforeEach(() => {
-        originalSignature = transaction.inputMap.signature;
-        originalSenderOutput = transaction.outputMap[senderWallet.publicKey];
+        orgSignature = transaction.inputMap.signature;
+        orgSenderOutput = transaction.outputMap[sender.publicKey];
         nextAmount = 30;
         nextRecipient = 'Adam';
 
         transaction.update({
-          sender: senderWallet,
+          sender,
           recipient: nextRecipient,
           amount: nextAmount,
         });
@@ -119,8 +119,8 @@ describe('Transaction Management', () => {
       });
 
       it('should deduct the correct amount from the original sender output balance', () => {
-        expect(transaction.outputMap[senderWallet.publicKey]).toEqual(
-          originalSenderOutput - nextAmount
+        expect(transaction.outputMap[sender.publicKey]).toEqual(
+          orgSenderOutput - nextAmount
         );
       });
 
@@ -133,7 +133,7 @@ describe('Transaction Management', () => {
       });
 
       it('should create a new signature for the updated transaction', () => {
-        expect(transaction.inputMap.signature).not.toEqual(originalSignature);
+        expect(transaction.inputMap.signature).not.toEqual(orgSignature);
       });
     });
   });
@@ -143,9 +143,7 @@ describe('Transaction Management', () => {
 
     beforeEach(() => {
       minerWallet = new Wallet();
-      transactionReward = Transaction.createRewardTransaction({
-        miner: minerWallet,
-      });
+      transactionReward = Transaction.transactionReward({ minerWallet });
     });
 
     it('should create a reward transaction with the address of the miner', () => {

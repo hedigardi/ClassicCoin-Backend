@@ -1,7 +1,6 @@
 import PubNub from 'pubnub';
 
 const CHANNELS = {
-  DEMO: 'DEMO',
   BLOCKCHAIN: 'BLOCKCHAIN',
   TRANSACTION: 'TRANSACTION',
 };
@@ -12,6 +11,7 @@ export default class PubNubServer {
     this.transactionPool = transactionPool;
     this.wallet = wallet;
     this.pubnub = new PubNub(credentials);
+
     this.pubnub.subscribe({ channels: Object.values(CHANNELS) });
     this.pubnub.addListener(this.listener());
   }
@@ -48,7 +48,7 @@ export default class PubNubServer {
             break;
           case CHANNELS.TRANSACTION:
             if (
-              !this.transactionPool.findTransactionByAddress({
+              !this.transactionPool.transactionExists({
                 address: this.wallet.publicKey,
               })
             ) {
@@ -63,6 +63,16 @@ export default class PubNubServer {
   }
 
   publish({ channel, message }) {
-    this.pubnub.publish({ channel, message });
+    this.pubnub.publish({ channel, message }, (status, response) => {
+      if (status.error) {
+        console.log(
+          `Failed to publish message on channel ${channel}: ${status.message}`
+        );
+      } else {
+        console.log(
+          `Successfully published message on channel ${channel} with timetoken ${response.timetoken}`
+        );
+      }
+    });
   }
 }
