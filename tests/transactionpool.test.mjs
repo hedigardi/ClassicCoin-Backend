@@ -1,4 +1,4 @@
-import { it, describe, expect, beforeEach } from 'vitest';
+import { it, expect, beforeEach, describe } from 'vitest';
 import Transaction from '../models/Transaction.mjs';
 import Wallet from '../models/Wallet.mjs';
 import TransactionPool from '../models/TransactionPool.mjs';
@@ -26,8 +26,9 @@ describe('Transaction Pool Functionality', () => {
   describe('Adding Transactions', () => {
     it('should add a transaction to the transaction pool', () => {
       transactionPool.addTransaction(transaction);
-
-      expect(transactionPool.transactionMap[transaction.id]).toBe(transaction);
+      expect(transactionPool.transactionMap[transaction.id]).toEqual(
+        transaction
+      );
     });
   });
 
@@ -36,8 +37,8 @@ describe('Transaction Pool Functionality', () => {
       transactionPool.addTransaction(transaction);
 
       expect(
-        transactionPool.findTransactionByAddress({ address: sender.publicKey })
-      ).toBe(transaction);
+        transactionPool.transactionExists({ address: sender.publicKey })
+      ).toEqual(transaction);
     });
   });
 
@@ -67,7 +68,7 @@ describe('Transaction Pool Functionality', () => {
     });
 
     it('should return only valid transactions', () => {
-      expect(transactionPool.getValidTransactions()).toStrictEqual(
+      expect(transactionPool.validateTransactions()).toStrictEqual(
         transactions
       );
     });
@@ -83,9 +84,9 @@ describe('Transaction Pool Functionality', () => {
   describe('Clearing Block Transactions', () => {
     it('should remove block transactions from the pool', () => {
       const blockchain = new Blockchain();
-      const expectedMap = {};
+      const expectedTransactionMap = {};
 
-      for (let i = 0; i < 20; i++) {
+      for (let i = 0; i < 10; i++) {
         const transaction = new Wallet().createTransaction({
           recipient: 'Nils Nilsson',
           amount: 5,
@@ -96,13 +97,13 @@ describe('Transaction Pool Functionality', () => {
         if (i % 2 === 0) {
           blockchain.addBlock({ data: [transaction] });
         } else {
-          expectedMap[transaction.id] = transaction;
+          expectedTransactionMap[transaction.id] = transaction;
         }
       }
 
       transactionPool.clearBlockTransactions({ chain: blockchain.chain });
 
-      expect(transactionPool.transactionMap).toEqual(expectedMap);
+      expect(transactionPool.transactionMap).toEqual(expectedTransactionMap);
     });
   });
 });

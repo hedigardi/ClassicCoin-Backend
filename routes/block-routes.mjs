@@ -3,6 +3,6 @@ import { mineBlock } from '../controllers/block-controller.mjs';
 
 const router = express.Router();
 
-router.route('/mine').post(mineBlock);
+router.post('/mine', mineBlock);
 
 export default router;

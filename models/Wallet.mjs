@@ -1,37 +1,33 @@
 import { STARTING_BALANCE } from '../config/settings.mjs';
-import { ellipticHash, createHash } from '../utilities/crypto-lib.mjs';
+import { createHash, elliptic } from '../utilities/crypto-lib.mjs';
 import Transaction from './Transaction.mjs';
 
 export default class Wallet {
   constructor() {
     this.balance = STARTING_BALANCE;
-    this.keyPair = ellipticHash.genKeyPair();
+    this.keyPair = elliptic.genKeyPair();
     this.publicKey = this.keyPair.getPublic().encode('hex');
   }
 
   static calculateBalance({ chain, address }) {
     let total = 0;
-    let isTransactionFound = false;
+    let hasAddedTransaction = false;
 
     for (let i = chain.length - 1; i > 0; i--) {
       const block = chain[i];
 
       for (let transaction of block.data) {
-        if (transaction.inputMap.address === address) {
-          isTransactionFound = true;
+        if (transaction.input.address === address) {
+          hasAddedTransaction = true;
         }
-
         const value = transaction.outputMap[address];
-
         if (value) {
           total += value;
         }
       }
-
-      if (isTransactionFound) break;
+      if (hasAddedTransaction) break;
     }
-
-    return isTransactionFound ? total : STARTING_BALANCE + total;
+    return hasAddedTransaction ? total : STARTING_BALANCE + total;
   }
 
   createTransaction({ recipient, amount, chain }) {
