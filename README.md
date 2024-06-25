@@ -4,6 +4,21 @@
 
 This project involves developing the backend for a fictional cryptocurrency blockchain. It includes features for listing blocks, creating and mining transactions, as well as user login and registration functionalities.
 
+## ENV Variables
+
+```sh
+NODE_ENV=
+PORT=
+PUBLISH_KEY=
+SUBSCRIBE_KEY=
+SECRET_KEY=
+USER_ID=
+MONGO_URI=
+JWT_SECRET=
+JWT_TTL=
+JWT_COOKIE=
+```
+
 ## Installation
 
 1. Clone the repository:
