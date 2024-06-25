@@ -14,11 +14,11 @@ This project involves developing the backend for a fictional cryptocurrency bloc
    ```sh
    npm i
    ```
-3. Start the development server:
+3. Start the application:
    ```sh
    npm run dev
    ```
-4. Start additional nodes
+4. Start an additional node
 
 ```sh
  npm run dev-node
