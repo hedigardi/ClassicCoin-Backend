@@ -7,12 +7,6 @@ import User from '../models/UserModel.mjs';
 import { asyncHandler } from '../middleware/asyncHandler.mjs';
 import Miner from '../models/Miner.mjs';
 
-export const getWalletEndpoints = (req, res, next) => {
-  res.status(200).json(ResponseModel.get('', '/api/v1/wallet'));
-  const newWallet = new Wallet();
-  const publicKey = newWallet.publicKey;
-};
-
 export const addTransaction = (req, res, next) => {
   const { recipient, amount } = req.body;
 
@@ -41,11 +35,17 @@ export const getTransactionPool = (req, res, next) => {
   res.status(200).json(ResponseModel.get('', transactionPool.transactionMap));
 };
 
-export const getWalletbalance = (req, res, next) => {
+export const getWalletBalance = (req, res, next) => {
   const address = wallet.publicKey;
   const balance = wallet.calculateBalance({ chain: blockchain, address });
 
   res.status(200).json(ResponseModel.get('', balance));
+};
+
+export const getWalletDetails = (req, res, next) => {
+  res.status(200).json(ResponseModel.get('', '/api/v1/wallet'));
+  const newWallet = new Wallet();
+  const publicKey = newWallet.publicKey;
 };
 
 export const mineTransaction = (req, res, next) => {

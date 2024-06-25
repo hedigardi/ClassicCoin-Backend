@@ -2,8 +2,8 @@ import express from 'express';
 import {
   addTransaction,
   getTransactionPool,
-  getWalletbalance,
-  getWalletEndpoints,
+  getWalletBalance,
+  getWalletDetails,
   mineTransaction,
   signIn,
   signUp,
@@ -14,8 +14,8 @@ const router = express.Router();
 
 router.post('/transaction', authenticate, authorize('user'), addTransaction);
 router.get('/transactions', getTransactionPool);
-router.get('/balance', getWalletbalance);
-router.get('/', getWalletEndpoints);
+router.get('/balance', getWalletBalance);
+router.get('/', getWalletDetails);
 router.get('/mine-transactions', mineTransaction);
 router.post('/signin', signIn);
 router.post('/signup', signUp);

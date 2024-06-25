@@ -9,22 +9,6 @@ export default class TransactionPool {
     this.transactionMap[transaction.id] = transaction;
   }
 
-  transactionExists({ address }) {
-    return Object.values(this.transactionMap).find(
-      (transaction) => transaction.inputMap.address === address
-    );
-  }
-
-  validateTransactions() {
-    return Object.values(this.transactionMap).filter((transaction) =>
-      Transaction.validate(transaction)
-    );
-  }
-
-  clearTransactions() {
-    this.transactionMap = {};
-  }
-
   clearBlockTransactions({ chain }) {
     for (let i = 1; i < chain.length; i++) {
       const block = chain[i];
@@ -37,7 +21,23 @@ export default class TransactionPool {
     }
   }
 
+  clearTransactions() {
+    this.transactionMap = {};
+  }
+
   replaceTransactionMap(transactionMap) {
     this.transactionMap = transactionMap;
+  }
+
+  transactionExists({ address }) {
+    return Object.values(this.transactionMap).find(
+      (transaction) => transaction.inputMap.address === address
+    );
+  }
+
+  validateTransactions() {
+    return Object.values(this.transactionMap).filter((transaction) =>
+      Transaction.validate(transaction)
+    );
   }
 }
