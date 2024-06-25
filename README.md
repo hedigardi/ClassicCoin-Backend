@@ -6,6 +6,8 @@ This project involves developing the backend for a fictional cryptocurrency bloc
 
 ## ENV Variables
 
+Before starting the application, ensure the following environment variables are configured.
+
 ```sh
 NODE_ENV=
 PORT=
