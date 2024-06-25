@@ -6,7 +6,7 @@ This project involves developing the backend for a fictional cryptocurrency bloc
 
 ## ENV Variables
 
-Before starting the application, ensure the following environment variables are configured.
+To start the application, make sure to configure the following environment variables by creating a `config.env` file in the `config` folder.
 
 ```sh
 NODE_ENV=
