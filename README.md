@@ -1,4 +1,4 @@
-# Classic Coin
+# Classic Coin - Backend
 
 ## Introduction
 
